@@ -4,6 +4,21 @@
 
 [👋 Introduction | Kubernetes Goat](https://madhuakula.com/kubernetes-goat/docs/)
 
+# Scenarios
+
+1. Container Escape to the Host System
+Exploit: This scenario demonstrates how attackers can exploit misconfigured privileged containers to escape a Docker container and gain access to the host system.
+Impact: Once the attacker escapes, they can gain host-level privileges, manipulate Kubernetes nodes, and potentially compromise the entire Kubernetes cluster.
+Lesson: Avoid granting unnecessary privileges to containers, especially HostPath mounts, to prevent such security breaches.
+2. RBAC Least Privileges Misconfiguration
+Exploit: Attackers exploit overly permissive RBAC (Role-Based Access Control) settings to access sensitive Kubernetes secrets using service accounts.
+Impact: Using service accounts tied to a pod, the attacker can extract API secrets and credentials, like the k8svaultapikey, compromising sensitive resources.
+Lesson: Enforce the principle of least privilege in RBAC configurations to limit access to only the necessary Kubernetes resources.
+3. Sensitive Keys in Codebases
+Exploit: Sensitive information like API keys and credentials committed in code repositories can be exposed and exploited by attackers.
+Impact: Publicly accessible version control systems can leak critical data, such as AWS keys and environment variables, leading to security breaches.
+Lesson: Scan codebases regularly for sensitive information, and avoid committing secrets or credentials to version control systems.
+
 # Installation
 
 1. https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/ (check you architecture `uname -m`)
