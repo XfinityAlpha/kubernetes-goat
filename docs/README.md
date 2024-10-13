@@ -4,7 +4,7 @@
 
 [👋 Introduction | Kubernetes Goat](https://madhuakula.com/kubernetes-goat/docs/)
 
-### Scenarios
+# Scenarios
 
 1. **Container Escape to the Host System**
    - **Exploit:** This scenario demonstrates how attackers can exploit misconfigured privileged containers to escape a Docker container and gain access to the host system.
