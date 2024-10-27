@@ -39,9 +39,14 @@
     
     `kubectl get pods`
     
-- Restart Containers:
+- **Restart Containers**:
     
     `kubectl rollout restart deployment`
+  
+- **Sets up the Kubernetes Goat environment**:
+
+    `bash access-kubernetes-goat.sh`
+  
     
 
 # 1 - Container escape to the host system
@@ -74,8 +79,8 @@ You'll learn how to:
 
 ### Steps
 
-1. **Run the script**: `bash access-kubernetes-goat.sh`
-    - **Reason**: This sets up the Kubernetes Goat environment with vulnerable configurations, allowing you to explore misconfigurations and container security flaws.
+1. **Go to**:
+    - To get started with the scenario, navigate to http://127.0.0.1:1233
 2. **Check container privileges**:
     - Run `capsh --print` to print out the container's capabilities.
     - Use the `mount` command to see if the host system is mounted (for example, at `/host-system`).
@@ -139,10 +144,12 @@ In this scenario, you’ll learn how to:
 
 ### Steps
 
-1. **Access the service account token**:
+1. **Go to**:
+    - To get started with the scenario, navigate to http://127.0.0.1:1236
+2. **Access the service account token**:
     - Navigate to the service account token directory:`cd /var/run/secrets/kubernetes.io/serviceaccount/`
     - **Reason**: Kubernetes stores authentication tokens for each pod’s service account here. These tokens can be used to interact with the Kubernetes API.
-2. **Set environment variables for the API interaction**:
+3. **Set environment variables for the API interaction**:
     - Export the internal API server hostname:`export APISERVER=https://${KUBERNETES_SERVICE_HOST}`
     - Export the service account token and other necessary paths:
         
@@ -157,19 +164,19 @@ In this scenario, you’ll learn how to:
         ```
         
     - **Reason**: These variables allow you to securely communicate with the API server using the pod's service account.
-3. **Query the Kubernetes API**:
+4. **Query the Kubernetes API**:
     - List all secrets in the default namespace:`curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/secrets`
     - **Reason**: The service account token might have permissions to read secrets, revealing sensitive information such as API keys or flags.
-4. **Query secrets in a specific namespace**:
+5. **Query secrets in a specific namespace**:
     - To query secrets in the current namespace, run:`curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/${NAMESPACE}/secrets`
     - **Reason**: Kubernetes stores secrets at the namespace level. This helps narrow down the search for sensitive information in the targeted namespace.
-5. **Query pods in the namespace**:
+6. **Query pods in the namespace**:
     - To list the running pods, execute:`curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/${NAMESPACE}/pods`
     - **Reason**: Understanding what pods are running may help in further exploration of the cluster.
-6. **Find and extract the `k8svaultapikey`**:
+7. **Find and extract the `k8svaultapikey`**:
     - Use `grep` to search for the `k8svaultapikey` in the secrets:`curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/${NAMESPACE}/secrets | grep k8svaultapikey`
     - **Reason**: The `k8svaultapikey` secret is what you're after to find the flag in this scenario.
-7. **Decode the secret**:
+8. **Decode the secret**:
     - Once you have the base64 encoded secret, decode it using:`echo "<base64-value>" | base64 -d`
     - **Reason**: Kubernetes secrets are encoded in base64 for storage, so you'll need to decode them to read the actual values.
 
@@ -206,17 +213,17 @@ https://madhuakula.com/kubernetes-goat/docs/scenarios/scenario-1/sensitive-keys-
 
 ### Steps
 
-- **Run script**: `bash access-kubernetes-goat.sh`
-    - **Reason**: This script is used to start the Kubernetes Goat environment locally. It sets up the vulnerable application so you can start exploring security weaknesses (e.g., sensitive data exposure).
-- **Access `.git` config**: `http://127.0.0.1:1230/.git/config`
+1. **Go to**:
+    - To get started with the scenario, navigate to http://127.0.0.1:1230
+2. **Access `.git` config**: `http://127.0.0.1:1230/.git/config`
     - **Reason**: The `.git` folder contains the version control information for the application. If it’s publicly accessible, attackers can potentially download the entire repository, including sensitive files like credentials.
-- **Install `git-dumper`**: `pip3 install git-dumper`
+3. **Install `git-dumper`**: `pip3 install git-dumper`
     - **Reason**: Installing the tool allows you to use it to dump the exposed Git repository for further analysis.
-- **Dump the repository**: `git-dumper http://localhost:1230/.git git_extract`
+4. **Dump the repository**: `git-dumper http://localhost:1230/.git git_extract`
     - **Reason**: This command extracts the entire Git repository from the exposed `.git` folder, allowing you to analyze the code and commit history locally. In real-world attacks, this would be where attackers look for sensitive information.
-- **Explore commits**: `git log`, then `git checkout <commit id>`
+5. **Explore commits**: `git log`, then `git checkout <commit id>`
     - **Reason**: `git log` shows the history of commits, which could include sensitive information in older versions of the code. Checking out specific commits (`git checkout <commit id>`) allows you to look at the project state at a particular point in time.
-- **List files**: `ls -la`, then check `.env` for sensitive info (flags).
+6. **List files**: `ls -la`, then check `.env` for sensitive info (flags).
     - **Reason**: The `.env` file often contains environment variables such as API keys, database passwords, and access credentials. Listing hidden files (`ls -la`) helps find files like `.env` that are often used to store sensitive information. Running `cat .env` reveals the contents, which might include hardcoded credentials or flags for pentesting exercises.
 
 ---
